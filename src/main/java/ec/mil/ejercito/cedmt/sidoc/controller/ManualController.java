@@ -155,7 +155,7 @@ public class ManualController {
     }
 
     @CrossOrigin(origins = "http://localhost:4200")
-    @GetMapping("/eliminarManual/{id}")
+    @DeleteMapping("/eliminarManual/{id}")
     public ResponseEntity<String> eliminarManual(@PathVariable Long id) {
         try {
             manualService.eliminarManual(id);
