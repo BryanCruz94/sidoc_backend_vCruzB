@@ -23,6 +23,7 @@ public class ManualImageController {
         this.manualImageService = imgSvc;
     }
 
+    @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping("/{id}/image")
     public ResponseEntity<byte[]> getManualImage(@PathVariable("id") Long id) {
         var manual = docEjercitoRepository.findById(id)

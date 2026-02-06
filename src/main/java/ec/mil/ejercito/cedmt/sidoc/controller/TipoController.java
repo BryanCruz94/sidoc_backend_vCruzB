@@ -1,15 +1,11 @@
 package ec.mil.ejercito.cedmt.sidoc.controller;
 
 
-import ec.mil.ejercito.cedmt.sidoc.dto.CategoriaListDTO;
+
 import ec.mil.ejercito.cedmt.sidoc.dto.TipoListDTO;
-import ec.mil.ejercito.cedmt.sidoc.service.CategoriaService;
 import ec.mil.ejercito.cedmt.sidoc.service.TipoService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 

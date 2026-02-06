@@ -18,6 +18,13 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 
 import org.springframework.security.web.SecurityFilterChain;
 
+
+import java.util.List;
+
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 @Configuration
 public class SecurityConfig {
 
@@ -32,6 +39,7 @@ public class SecurityConfig {
         return http
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(csrf -> csrf.disable())
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health").permitAll()
                         .anyRequest().authenticated()
@@ -50,4 +58,30 @@ public class SecurityConfig {
         jwtDecoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(withIssuer, withAudience));
         return jwtDecoder;
     }
+
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        // Angular dev
+        config.setAllowedOrigins(List.of("http://localhost:4200"));
+
+        // Métodos típicos
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+        // Headers que Angular suele enviar (incluye Authorization)
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+
+        // Si vas a leer headers en el cliente (opcional)
+        config.setExposedHeaders(List.of("Authorization"));
+
+        // Si NO usas cookies/sesión (JWT en header), mejor dejarlo en false
+        config.setAllowCredentials(false);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
 }
