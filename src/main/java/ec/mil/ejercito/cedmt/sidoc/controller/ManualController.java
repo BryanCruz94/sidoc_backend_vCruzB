@@ -31,7 +31,7 @@ public class ManualController {
     }
 
 
-    //@PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('admin')")
     @PostMapping("/subirManual")
     public ResponseEntity<ManualNewResponseDTO> subirManual(
             @RequestParam("nombre") String nombre,
