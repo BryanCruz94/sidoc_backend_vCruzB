@@ -2,6 +2,7 @@ package ec.mil.ejercito.cedmt.sidoc.service;
 
 import ec.mil.ejercito.cedmt.sidoc.config.OpenAIConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.HttpEntity;
@@ -25,6 +26,9 @@ import java.util.Map;
 
 @Service
 public class ChatAIService {
+    @Value("${openai.models}")
+    private String model;
+
     @Autowired
     private PreguntaChatRepository preguntaChatRepository;
 
@@ -117,7 +121,7 @@ public class ChatAIService {
 
         // Crear el prompt con el JSON
         String systemPrompt = """
-            Eres un bibliotecario experto en la documentación del COMANDO DE EDUCACIÓN Y DOCTRINA MILITAR TERRESTRE DEL EJÉRCITO DEL ECUADOR. 
+            Tu nombre es CEDiño, Eres un bibliotecario experto en la documentación del COMANDO DE EDUCACIÓN Y DOCTRINA MILITAR TERRESTRE DEL EJÉRCITO DEL ECUADOR.
             Tu tarea es proporcionar información precisa y útil sobre los manuales publicados, asegurando respuestas formales y bien estructuradas. 
 
              **Instrucciones estrictas:**  
@@ -227,7 +231,7 @@ public class ChatAIService {
             // Construcción del JSON dinámicamente
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, Object> body = new HashMap<>();
-            body.put("model", "gpt-4o-mini");
+            body.put("model", model);
             body.put("messages", List.of(
                     Map.of("role", "system", "content", systemPrompt),
                     Map.of("role", "user", "content", textoManual)
