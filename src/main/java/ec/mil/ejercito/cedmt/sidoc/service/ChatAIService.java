@@ -98,11 +98,7 @@ public class ChatAIService {
                 Devuelve solo la respuesta sin explicaciones adicionales.
                 """;
 
-        return sendChatRequest(userMessage, model, systemPrompt, apiUrl, apiKey,
-                0.2, // temperature (baja para consistencia en 1/0)
-                0.0, // frequency_penalty
-                0.0  // presence_penalty
-        );
+        return sendChatRequest(userMessage, model, systemPrompt, apiUrl, apiKey);
     }
 
     private String getChatResponse(String userMessage, String model, String provider) {
@@ -118,7 +114,7 @@ public class ChatAIService {
             throw new RuntimeException("Error al convertir manuales a JSON", e);
         }
 
-        // Crear el prompt con el JSON (SE MANTIENE TAL CUAL)
+        // Crear el prompt con el JSON
         String systemPrompt = """
             Tu nombre es CEDiño, Eres un bibliotecario experto en la documentación del COMANDO DE EDUCACIÓN Y DOCTRINA MILITAR TERRESTRE DEL EJÉRCITO DEL ECUADOR.
             Tu tarea es proporcionar información precisa y útil sobre los manuales, notas de aula y reglamentos publicados, asegurando respuestas formales y bien estructuradas. 
@@ -128,7 +124,7 @@ public class ChatAIService {
             2 Si te solicitan la cantidad de documentos disponibles, responde primero con el número exacto y luego enlista los manuales.  
             3 (NUNCA inventes nombres de manuales). Solo menciona los manuales que aparecen en la lista proporcionada.  
             4 Excluye explicaciones innecesarias o información fuera del contexto de los manuales. 
-            5 Debes responder con un tono militar, como un soldado del ejército Ecuatoriano, pero sin perder la amabilidad. Responde como si fueras un subordinado de quien pregunta.
+            5 Debes responder con un tono militar de Ecuador, pero sin perder la amabilidad. Responde como si fueras un subordinado de quien pregunta.
             6 Tus respuestas deben ser claras y estructuradas en un formato de recomendación, como este ejemplo:  
 
                - [Nombre del Manual] (Año de publicación): Breve descripción relevante (10-15 palabras).  
@@ -139,13 +135,7 @@ public class ChatAIService {
         String apiUrl = getApiUrl(provider);
         String apiKey = getApiKey(provider);
 
-        // Solo añadimos parámetros (sin cambiar prompts ni lógica)
-        // temperature moderada para “humanizar” un poco, penalties para reducir repetición.
-        return sendChatRequest(userMessage, model, systemPrompt, apiUrl, apiKey,
-                0.6,  // temperature
-                0.45, // frequency_penalty
-                0.2   // presence_penalty
-        );
+        return sendChatRequest(userMessage, model, systemPrompt, apiUrl, apiKey);
     }
 
     private String getApiUrl(String provider) {
@@ -161,15 +151,13 @@ public class ChatAIService {
         switch (provider) {
             case "OpenAI":
                 return openAIConfig.getApiKey();
-
             default:
                 throw new IllegalArgumentException("Proveedor no soportado: " + provider);
         }
     }
 
     //PARA OPENAI
-    private String sendChatRequest(String userMessage, String model, String systemPrompt, String apiUrl, String apiKey,
-                                   double temperature, double frequencyPenalty, double presencePenalty) {
+    private String sendChatRequest(String userMessage, String model, String systemPrompt, String apiUrl, String apiKey) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, Object> body = new HashMap<>();
@@ -178,11 +166,6 @@ public class ChatAIService {
                     Map.of("role", "system", "content", systemPrompt),
                     Map.of("role", "user", "content", userMessage)
             ));
-
-            // ✅ Parámetros solicitados (sin límites de tokens)
-            body.put("temperature", temperature);
-            body.put("frequency_penalty", frequencyPenalty);
-            body.put("presence_penalty", presencePenalty);
 
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "Bearer " + apiKey);
@@ -216,7 +199,6 @@ public class ChatAIService {
         }
     }
 
-
     //Servicio para obtener los manuales
     public List<ManualsToChatDTO> getManuals() {
         List<ManualsToChatDTO> manuals = manualRepository.findManualsToChat();
@@ -230,7 +212,7 @@ public class ChatAIService {
     //Metodo para obtener el resumen de un manual
     public String getManualAbstract(String textoManual) {
         try {
-            // Construcción del prompt optimizado (SE MANTIENE)
+            // Construcción del prompt optimizado
             String systemPrompt = """
                         Eres un bibliotecario encargado de generar descripciones para Manuales, Notas de aula, Reglamentos, Libros y textos.
                         Analiza el texto proporcionado y elabora un resumen conciso y preciso que sirva como guía del documento.
@@ -246,11 +228,6 @@ public class ChatAIService {
                     Map.of("role", "system", "content", systemPrompt),
                     Map.of("role", "user", "content", textoManual)
             ));
-
-            // ✅ Parámetros (sin límites de tokens). Resumen: baja variación para consistencia.
-            body.put("temperature", 0.3);
-            body.put("frequency_penalty", 0.1);
-            body.put("presence_penalty", 0.0);
 
             String requestBody = objectMapper.writeValueAsString(body);
 
