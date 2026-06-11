@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -30,7 +31,7 @@ public class ManualController {
     }
 
 
-    @CrossOrigin(origins = "http://localhost:4200")
+    @PreAuthorize("hasRole('admin')")
     @PostMapping("/subirManual")
     public ResponseEntity<ManualNewResponseDTO> subirManual(
             @RequestParam("nombre") String nombre,
@@ -72,7 +73,7 @@ public class ManualController {
     }
 
 
-    @CrossOrigin(origins = "http://localhost:4200")
+    @PreAuthorize("hasRole('admin')")
     @GetMapping("/manualParaEditar/{id}")
     public ResponseEntity<ManualResponseToEditDTO> manualParaEditar(@PathVariable Long id) {
         try {
@@ -84,7 +85,7 @@ public class ManualController {
                     .body(null);
         }
     }
-    @CrossOrigin(origins = "http://localhost:4200")
+    @PreAuthorize("hasRole('admin')")
     @PostMapping("/editarManual")
     public ResponseEntity<ManualNewResponseDTO> editarManual(
             @RequestParam("id") Long id,
@@ -154,8 +155,8 @@ public class ManualController {
         }
     }
 
-    @CrossOrigin(origins = "http://localhost:4200")
-    @GetMapping("/eliminarManual/{id}")
+    @PreAuthorize("hasRole('admin')")
+    @DeleteMapping("/eliminarManual/{id}")
     public ResponseEntity<String> eliminarManual(@PathVariable Long id) {
         try {
             manualService.eliminarManual(id);

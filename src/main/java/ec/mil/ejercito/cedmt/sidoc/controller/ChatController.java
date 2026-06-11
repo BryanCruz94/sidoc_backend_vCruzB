@@ -2,6 +2,7 @@ package ec.mil.ejercito.cedmt.sidoc.controller;
 
 import ec.mil.ejercito.cedmt.sidoc.service.ChatAIService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import ec.mil.ejercito.cedmt.sidoc.dto.ManualsToChatDTO;
 
@@ -14,11 +15,14 @@ public class ChatController {
     @Autowired
     private ChatAIService chatAIService;
 
+    @Value("${openai.models}")
+    private String model;
+
     @CrossOrigin(origins = "http://localhost:4200")
     @PostMapping("/manualsQuestions")
     public String chatOpenAI(@RequestBody String userMessage)
     {
-        return chatAIService.chatBot(userMessage, "gpt-4o-mini", "OpenAI");
+        return chatAIService.chatBot(userMessage, model, "OpenAI");
     }
 
 

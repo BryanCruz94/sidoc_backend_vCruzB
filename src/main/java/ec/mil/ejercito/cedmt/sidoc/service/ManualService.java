@@ -4,6 +4,7 @@ import ec.mil.ejercito.cedmt.sidoc.dto.DocEjercitoResponseDTO;
 import ec.mil.ejercito.cedmt.sidoc.dto.*;
 import ec.mil.ejercito.cedmt.sidoc.model.*;
 import ec.mil.ejercito.cedmt.sidoc.repository.*;
+import ec.mil.ejercito.cedmt.sidoc.service.ChatAIService;
 import ec.mil.ejercito.cedmt.sidoc.util.PdfWatermarkUtil;
 import ec.mil.ejercito.cedmt.sidoc.util.PdfToTextUtil;
 
@@ -52,6 +53,9 @@ public class ManualService {
     @Autowired
     private PdfWatermarkUtil pdfWatermarkUtil;
 
+    @Autowired
+    private ChatAIService chatAbstract;
+
     //RUTAS DE FTP
     @Value("${sidoc.ruta.archivos}")
     private String baseRutaArchivos;
@@ -83,6 +87,7 @@ public class ManualService {
         File tempArchivo = null;
         File tempPortada = null;
         File resizedPortada = null;
+        String textoPDF = null;
 
         try {
             // 1) Subir PDF al FTP
@@ -115,7 +120,17 @@ public class ManualService {
             Manual manual = new Manual();
             manual.setNombre(manualRequest.getNombre());
             manual.setCodigo(manualRequest.getCodigo());
-            manual.setDescripcion(manualRequest.getDescripcion());
+
+            if(manualRequest.getDescripcion().trim().equals("generar")){
+                textoPDF = convertirPDFaText(tempArchivo);
+                String descripcionIA = chatAbstract.getManualAbstract(textoPDF);
+                manual.setDescripcion(descripcionIA);
+                System.out.println("Se generará el resumen por IA");
+
+            }else{
+                manual.setDescripcion(manualRequest.getDescripcion());
+            }
+
             manual.setAnioPublicacion(LocalDate.parse(manualRequest.getAnioPublicacion()));
             manual.setEstado('1');
             manual.setPublicado('1');
